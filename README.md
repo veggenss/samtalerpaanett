@@ -1,5 +1,5 @@
 
-# Chat på Nett
+# Samtaler på nett
 <img src="https://github.com/user-attachments/assets/ce1fb91e-5326-441f-ad19-29a8d6192546" width="300" height="300">
 
 ## Nydelig design
