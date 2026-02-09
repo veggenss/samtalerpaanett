@@ -5,7 +5,5 @@ global_chat/global_chat_log.txt
 WebSocket_error.log
 webSocketLog.syslog
 mail.env
-composer.json
-composer.lock
 composer.phar
 .zed
