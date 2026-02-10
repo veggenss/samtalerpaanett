@@ -3,12 +3,9 @@ session_start();
 require 'functions.php';
 
 //redirecter bruker hvis de har uverifisert email eller ikke har svart på passord reset email
-if(isset($_COOKIE['not_verified'])){
+if(isset($_COOKIE['not_verified']) || isset($_COOKIE['password_token_set'])){
     header("Location: login.php");
-}
-
-if(isset($_COOKIE['password_token_set'])){
-    header("Location: login.php");
+    exit();
 }
 
 if (!isset($_SESSION['user_id'])) {
