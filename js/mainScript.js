@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log(data);
             appendMessage(data);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         };
@@ -268,6 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
             message: text,
             profilePictureUrl: currentProfilePictureUrl,
         };
+
+        console.log(messageData);
 
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify(messageData));
