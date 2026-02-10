@@ -385,7 +385,6 @@ button:active {
 
 .conversation:hover{
     background-color: rgba(0, 0, 0, 0.09);
-    border: 0px solid #00000017;
 }
 
 .conversation-user{
@@ -416,10 +415,11 @@ button:active {
     overflow: hidden;
 }
 .conversation-avatar{
-    height: 55px;
-    width: 55px;
-    border-radius: 50%;
+    height: 70px;
+    width: 70px;
+    border-radius: 50%; /* 50% */
     margin-right: 5px;
+    object-fit: cover;
 }
 
 @media screen and (max-width: 1075px) {
