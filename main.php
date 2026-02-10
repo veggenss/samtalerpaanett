@@ -48,7 +48,7 @@ $version = "0.5.2-alpha";
         <!--<li><a href="">+ Legg til venner</a></li>--> <!-- hvorfor skal legg til venner være i main.php istedet for i friends.php hvis det eventuelt skal være en ting? - mr brun -->
         </ul>
         <ul class="nav-prof">
-            <li><a href="/samtalerpanett/pages/profile.php"><img id="nav-pfp" src="uploads/<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" width=24 height=24> </i><?php echo htmlspecialchars($_SESSION['username']); ?></a></li>
+            <li><a href="/samtalerpanett/pages/profile.php"><img id="nav-pfp" src="uploads/<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>"</i><?php echo htmlspecialchars($_SESSION['username']); ?></a></li>
         </ul>
     </nav>
 

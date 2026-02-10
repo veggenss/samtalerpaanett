@@ -52,6 +52,8 @@ nav li:hover {
 
 #nav-pfp {
     border-radius: 50%;
+    width: 24px;
+    margin-right: 5px;
 }
 
 nav a {
