@@ -44,4 +44,5 @@ Den gir alle privileges/permissions på databasen conversationWeb til din bruker
 #### Step 1: Les det over dette her og se om du har det du trenger
 #### Step 2: Clone repo-et
 #### Step 3: Flytt mappen inn i document root-en til webserveren din slik at du kan se på det på localhost :D
-#### Step 4: PLEASE skriv god kode, gode kommentarer og gode commit meldinger
+#### Step 4: Alle file som har .example i navnet må du fylle ut infromasjonen selv. Også fjerne .example delen.
+#### Step 5: PLEASE skriv god kode, gode kommentarer og gode commit meldinger
