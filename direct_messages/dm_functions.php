@@ -155,8 +155,6 @@ elseif($action === 'loadConversationDiv'){
             "success" => true,
             "response" => "Fant " . count($conversations) . " samtaler",
             "conversations" => $conversations,
-            "recipientId" => $user2_id,
-            "prevStr" => $row['prevStr']
         ]);
     }
     else {
