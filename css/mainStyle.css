@@ -415,8 +415,8 @@ button:active {
     overflow: hidden;
 }
 .conversation-avatar{
-    height: 70px;
-    width: 70px;
+    height: 55px;
+    width: 55px;
     border-radius: 50%; /* 50% */
     margin-right: 5px;
     object-fit: cover;
