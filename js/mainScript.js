@@ -1,20 +1,67 @@
+const messagesDiv = document.getElementById('messages');
+const input = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+const newDM = document.getElementById('newDM');
+const dmList = document.getElementById('DMList');
+const globalEnable = document.getElementById('global-enable');
+const currentUserId = window.currentUserId;
+const currentUsername = window.currentUsername;
+const currentProfilePictureUrl = window.currentProfilePictureUrl;
+
+recipientId = "all";
+activeChatType = "global";
+let sending = false;
+let ws = null;
+
+function appendMessage(data) {
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('message');
+
+    const avatar = document.createElement('img');
+    avatar.classList.add('avatar');
+    avatar.src = data.profilePictureUrl || 'default.png';
+
+    const content = document.createElement('div');
+    content.classList.add('message-content');
+
+    const username = document.createElement('span');
+    username.classList.add('username');
+    username.textContent = data.username || 'Ukjent';
+
+    const text = document.createElement('div');
+    text.classList.add('text');
+    text.textContent = data.message;
+
+    if (data.username === "[System]") {
+        text.style.color = "#8B193C";
+        username.style.color = "#8B193C";
+        wrapper.style.backgroundColor = "#FFF1F2";
+    }
+
+    if (data.username === currentUsername) {
+        wrapper.style.backgroundColor = "#E9E9FF";
+        wrapper.style.flexDirection = "row-reverse";
+        wrapper.style.textAlign = "right";
+        wrapper.style.marginLeft = "auto";
+    }
+
+    content.appendChild(username);
+    content.appendChild(text);
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(content);
+
+    messagesDiv.prepend(wrapper);
+}
+
+function appendSystemMessage(message) {
+    appendMessage({
+        username: "[System]",
+        message,
+        profilePictureUrl: "assets/icons/default.png"
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-
-    const messagesDiv = document.getElementById('messages');
-    const input = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-    const newDM = document.getElementById('newDM');
-    const dmList = document.getElementById('DMList');
-    const globalEnable = document.getElementById('global-enable');
-    const currentUserId = window.currentUserId;
-    const currentUsername = window.currentUsername;
-    const currentProfilePictureUrl = window.currentProfilePictureUrl;
-
-    recipientId = "all";
-    activeChatType = "global";
-    let sending = false;
-    let ws = null;
-
     function init() {
         setupWebSocket();
         loadGlobalLog();
@@ -173,54 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 appendMessage(message, true);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             });
-        });
-    }
-
-    function appendMessage(data) {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('message');
-
-        const avatar = document.createElement('img');
-        avatar.classList.add('avatar');
-        avatar.src = data.profilePictureUrl || 'default.png';
-
-        const content = document.createElement('div');
-        content.classList.add('message-content');
-
-        const username = document.createElement('span');
-        username.classList.add('username');
-        username.textContent = data.username || 'Ukjent';
-
-        const text = document.createElement('div');
-        text.classList.add('text');
-        text.textContent = data.message;
-
-        if (data.username === "[System]") {
-            text.style.color = "#8B193C";
-            username.style.color = "#8B193C";
-            wrapper.style.backgroundColor = "#FFF1F2";
-        }
-
-        if (data.username === currentUsername) {
-            wrapper.style.backgroundColor = "#E9E9FF";
-            wrapper.style.flexDirection = "row-reverse";
-            wrapper.style.textAlign = "right";
-            wrapper.style.marginLeft = "auto";
-        }
-
-        content.appendChild(username);
-        content.appendChild(text);
-        wrapper.appendChild(avatar);
-        wrapper.appendChild(content);
-
-        messagesDiv.prepend(wrapper);
-    }
-
-    function appendSystemMessage(message) {
-        appendMessage({
-            username: "[System]",
-            message,
-            profilePictureUrl: "assets/icons/default.png"
         });
     }
 
