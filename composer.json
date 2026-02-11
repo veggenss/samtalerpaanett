@@ -5,5 +5,21 @@
         "cboden/ratchet": "^0.4.4"
     },
 
-    "license": "MIT"
+    "license": "MIT",
+    "name": "Samtaler På Nett",
+    "description": "Et fint chatteprogram laget av Brun og Weiss",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Isak Brun Henriksen",
+            "email": "isak@brunhenriksen.net",
+            "homepage": "https://isak.brunhenriksen.no",
+            "role": "Developer"
+        },
+        {
+            "name": "Viggo Weissmüller",
+            "email": "veggene.v@gmail.com",
+            "role": "Developer"
+        }
+    ]
 }
