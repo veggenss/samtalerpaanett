@@ -8,6 +8,10 @@ const currentUserId = window.currentUserId;
 const currentUsername = window.currentUsername;
 const currentProfilePictureUrl = window.currentProfilePictureUrl;
 
+console.log(
+    `User Id: ${currentUserId} \nUsername: ${currentUsername} \nProfile Picture URL: ${currentProfilePictureUrl}`
+)
+
 recipientId = "all";
 activeChatType = "global";
 let sending = false;
