@@ -99,5 +99,6 @@ $version = "0.5.2-alpha";
         window.currentProfilePictureUrl = <?php echo json_encode($wsprotocol . '://' . $wshostname . '/samtalerpanett/uploads/' . $_SESSION['profile_picture']); ?>;
    </script>
 </body>
+<script src="js/setupwebsocket.js"></script>
 <script src="js/mainScript.js"></script>
 </html>

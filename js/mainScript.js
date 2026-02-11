@@ -43,27 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function setupWebSocket() {
-        ws = new WebSocket('ws://localhost:8080/chat?userId=' + encodeURIComponent(currentUserId));
-
-        ws.onopen = () => {
-            console.log('Tilkobling til websocket åpnet :)');
-            ws.send(JSON.stringify({ type: 'register', user_id: currentUserId }));
-        };
-
-        ws.onclose = () => {
-            console.log('Tilkobling til websocket lukket :(');
-            appendSystemMessage('Tilkoblingen ble lukket. :(');
-        };
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log(data);
-            appendMessage(data);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        };
-    }
-
     function loadGlobalLog() {
         fetch('/samtalerpanett/global_chat/get_global_logs.php')
             .then(res => res.json())

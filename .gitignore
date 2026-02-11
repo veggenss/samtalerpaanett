@@ -7,3 +7,4 @@ webSocketLog.syslog
 mail.env
 composer.phar
 .zed
+js/setupwebsocket.js
