@@ -12,8 +12,8 @@ console.log(
     `User Id: ${currentUserId} \nUsername: ${currentUsername} \nProfile Picture URL: ${currentProfilePictureUrl}`
 )
 
-recipientId = "all";
-activeChatType = "global";
+let recipientId = "all";
+let activeChatType = "global";
 let sending = false;
 let ws = null;
 
