@@ -1,6 +1,7 @@
 <?php
 require_once 'include/db.inc.php';
 $mysqli = dbConnection();
+$socketParams = socketParams();
 
 if(!isset($_SESSION['user_id'])){
     return;
