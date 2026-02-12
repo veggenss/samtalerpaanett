@@ -224,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function sendMessage() {
+        console.log("Sendt melding (sendMessage())");
         if (sending) return;
         sending = true;
 
