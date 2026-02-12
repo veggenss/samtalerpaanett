@@ -12,10 +12,11 @@ $action = $_GET['action'] ?? ($data['action'] ?? null);
 if($action === 'get_user_id'){
 
     if($_GET['reciverUser']){
+        $reciverUserId = NULL; //deklerasjon for at phpactor ikke klager
         $reciverUser = $_GET['reciverUser'];
         $UsernameToUserId = ['success' => NULL, "response" => NULL];
 
-        $query="SELECT id FROM users WHERE username = ?";
+        $query = "SELECT id FROM users WHERE username = ?";
         $stmt = $mysqli->prepare($query);
         $stmt->bind_param("s", $reciverUser);
         $stmt->execute();

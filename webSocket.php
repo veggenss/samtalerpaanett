@@ -1,6 +1,4 @@
 <?php
-// Velkommen til webSocket.php - Her ligger masse alien kode som ingen kan fortså :)
-
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\App;
@@ -9,6 +7,7 @@ require __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/include/db.inc.php';
 
 $mysqli = dbConnection();
+$socketParams = socketParams();
 $d = date("[Y/m/d l:H:i:s] ");
 
 class Chat implements MessageComponentInterface {
@@ -201,6 +200,6 @@ class Chat implements MessageComponentInterface {
 }
 
 // lager websocket :D
-$server = new App($wshostname, $wsport);
-$server->route($wsroute, new Chat, ['*']);
+$server = new App($socketParams['hostname'], $socketParams['port']);
+$server->route($socketParams['route'], new Chat, ['*']);
 $server->run();
