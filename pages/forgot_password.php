@@ -18,7 +18,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $stmt->execute();
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
-        
+
         if(!$user){
             $error = "Kunne ikke finne bruker";
         }
@@ -48,7 +48,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         else{
             $error = "Ugyldig e-post eller brukernavn";
-        }  
+        }
     }
 }
 ?>
@@ -60,7 +60,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <link rel="stylesheet" href="../css/userRegLog.css">
     <link rel="icon" href="../assets/icons/logo.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
-    <title>Chat På Nett | Glemt Passord</title>
+    <title>Samtaler på nett | Glemt Passord</title>
 </head>
 <body>
 <div class="auth-con">
@@ -78,7 +78,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         <div class="form-group">
             <label>E-posten din:</label>
-            <input type="email" name="email" placeholder="e-post" required>   
+            <input type="email" name="email" placeholder="e-post" required>
         </div>
 
         <button type="submit" name="submit">Send e-post</button>
@@ -90,6 +90,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <?php if(isset($sent)):?>
     <div class="positive"><?php echo $sent;?></div>
     <?php endif; ?>
-</div>   
+</div>
 </body>
 </html>

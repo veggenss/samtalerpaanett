@@ -29,7 +29,7 @@ else{
 }
 
 if($verified && $_SERVER['REQUEST_METHOD'] == 'POST'){
-    
+
     $new_password = trim($_POST['password']);
     $r_new_password = trim($_POST['r-password']);
 
@@ -71,7 +71,7 @@ if($verified && $_SERVER['REQUEST_METHOD'] == 'POST'){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/userRegLog.css">
     <link rel="icon" href="assets/icons/logo.ico">
-    <title>Chat På Nett | Tilbakestill Passord</title>
+    <title>Samtaler på nett | Tilbakestill Passord</title>
 </head>
 <body>
     <div class="auth-con">
@@ -88,7 +88,7 @@ if($verified && $_SERVER['REQUEST_METHOD'] == 'POST'){
 
             <div class="form-group">
                 <label>Gjenta nye passord</label>
-                <input type="password" name="r-password" placeholder="gjenta passord" required>   
+                <input type="password" name="r-password" placeholder="gjenta passord" required>
             </div>
 
             <button type="submit"><?php echo (!empty($message)) ? "Redirekter om 5..." : "Oppdater Passord"; ?></button>

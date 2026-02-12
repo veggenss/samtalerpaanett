@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 
 <head>
-    <title>Chat På Nett | Profil</title>
+    <title>Samtaler på nett | Profil</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="../assets/icons/logo.ico" />
     <link rel="stylesheet" href="../css/userRegLog.css">

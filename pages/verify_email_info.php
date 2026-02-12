@@ -36,7 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/samtalerpanett/assets/icons/logo.ico">
     <link rel="stylesheet" href="../css/userRegLog.css">
-    <title>Chat På Nett | E-post sendt</title>
+    <title>Samtaler på nett | E-post sendt</title>
 </head>
 <body>
     <div class="auth-con">

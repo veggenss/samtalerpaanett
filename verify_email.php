@@ -35,14 +35,14 @@ else{
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="assets/icons/logo.ico" />
     <link rel="stylesheet" href="css/userRegLog.css">
-    <title>Chat På Nett | Verifiser Email</title>
+    <title>Samtaler på nett | Verifiser Email</title>
 </head>
 <body>
     <div class="mail-con">
         <h2>E-post Verifisering...</h2><br>
         <?php if($message){echo "<div class='positive'>$message</div>";}?>
         <?php if($error){echo "<div class='error'>$error</div>";}?>
-    </div> 
+    </div>
 </body>
 </html>
 

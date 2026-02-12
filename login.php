@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 <html>
 
 <head>
-    <title>Chat På Nett | Logg inn</title>
+    <title>Samtaler på nett | Logg inn</title>
     <link rel="icon" href="assets/icons/logo.ico" />
     <link rel="stylesheet" href="css/userRegLog.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
