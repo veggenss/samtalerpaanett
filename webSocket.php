@@ -201,5 +201,5 @@ class Chat implements MessageComponentInterface {
 
 // lager websocket :D
 $server = new App($socketParams['hostname'], $socketParams['port']);
-$server->route('/chat', new Chat, ['*']);
+$server->route($socketParams['route'], new Chat, ['*']);
 $server->run();
