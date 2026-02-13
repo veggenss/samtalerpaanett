@@ -8,7 +8,7 @@ const currentUserId = window.currentUserId;
 const currentUsername = window.currentUsername;
 const currentProfilePictureUrl = window.currentProfilePictureUrl;
 
-console.log('User Id:' + currentUserId + '\nUsername: + ' + currentUsername + '\nProfile Picture URL: + ' + currentProfilePictureUrl); //debug :3
+console.log(`User Id ${currentUserId} \nUsername: ${currentUsername} \nProfile Picture URL: ${currentProfilePictureUrl}`); //debug :3
 let recipientId = "all";
 let activeChatType = "global";
 let sending = false;
