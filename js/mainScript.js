@@ -102,13 +102,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadConversationDiv() {
-        fetch('/samtalerpanett/direct_messages/dm_functions.php', {
+        fetch('/samtalerpanett/direct_messages/DmHandler.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'loadConversationDiv', user_id: currentUserId })
         })
             .then(res => res.json())
             .then(data => {
+                console.log("loadConvData:", data);
                 if (data.success === true && Array.isArray(data.conversations)) {
                     data.conversations.forEach(conv => {
                         renderConversationList(conv);
@@ -130,21 +131,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        fetch('/samtalerpanett/direct_messages/dm_functions.php?action=get_user_id&reciverUser=' + encodeURIComponent(reciverUser))
+        fetch('/samtalerpanett/direct_messages/DmHandler.php?action=getUserId&reciverUser=' + encodeURIComponent(reciverUser))
             .then(res => res.json())
             .then(data => {
-                console.log(data.reciverUserId);
+                console.log("reciverUserData", data);
                 if (data.success === false) {
                     alert(data.response);
                     return;
                 }
-                fetch('/samtalerpanett/direct_messages/dm_functions.php', {
+                fetch('/samtalerpanett/direct_messages/DmHandler.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({action: 'createConversation', user1_id: currentUserId, user2_id: data.reciverUserId })
                 })
                     .then(res => res.json())
                     .then(data => {
+                        console.log("createConvData", data);
                         if (data.success === false) {
                             alert(data.response);
                             return;
@@ -203,13 +205,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadConvLog(conv) {
         messagesDiv.innerHTML = '';
 
-        fetch('/samtalerpanett/direct_messages/dm_functions.php', {
+        fetch('/samtalerpanett/direct_messages/DmHandler.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({action: 'loadConversationLog', conversation_id: conv.conversation_id, user2_id: conv.recipientId, user1_id: currentUserId, user1_name: currentUsername, user2_name: conv.recipientUsername})
         })
         .then(res => res.json())
-        .then(data => {
+            .then(data => {
+            console.log("loadConvMsgData:", data)
             if (data.success === false) {
                 alert(data.response);
                 return;
@@ -248,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
             profilePictureUrl: currentProfilePictureUrl,
         };
 
-        console.log(messageData);
+        // console.log(messageData);
 
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify(messageData));
