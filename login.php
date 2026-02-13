@@ -41,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
             else {
                 echo "Kunne ikke gi deg default profilbilde :(";
             }
-
         }
 
         if(!password_verify($_POST['password'], $user['password'])) {
