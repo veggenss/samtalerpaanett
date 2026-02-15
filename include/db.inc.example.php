@@ -15,6 +15,11 @@ function dbConnection()
     return $conn;
 }
 
-$protocol = 'http';
-$hostname = 'localhost';
-$port = 8080;
+function socketParams(){
+    return [
+        'hostname' => 'localhost',
+        'protocol' => 'http',
+        'route' => "/chat",
+        'port' => 8080
+    ];
+}
