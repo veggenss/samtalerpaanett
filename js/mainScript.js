@@ -10,6 +10,7 @@ const currentProfilePictureUrl = window.currentProfilePictureUrl;
 
 console.log(`User Id: ${currentUserId} \nUsername: ${currentUsername} \nProfile Picture URL: ${currentProfilePictureUrl}`); //debug :3let recipientId = "all";
 let activeChatType = "global";
+let recipientId = "all";
 let sending = false;
 let ws = null;
 
