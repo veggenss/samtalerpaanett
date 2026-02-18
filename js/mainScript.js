@@ -8,11 +8,12 @@ const currentUserId = window.currentUserId;
 const currentUsername = window.currentUsername;
 const currentProfilePictureUrl = window.currentProfilePictureUrl;
 
-console.log(`User Id: ${currentUserId} \nUsername: ${currentUsername} \nProfile Picture URL: ${currentProfilePictureUrl}`); //debug :3let recipientId = "all";
 let activeChatType = "global";
 let recipientId = "all";
 let sending = false;
 let ws = null;
+
+console.log(`User Id: ${currentUserId} \nUsername: ${currentUsername} \nProfile Picture URL: ${currentProfilePictureUrl}`); //debug :3
 
 function appendMessage(data) {
     const wrapper = document.createElement('div');
@@ -99,11 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.forEach(message => appendMessage(message, true));
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             })
-            .catch(console.error);
+            .catch(err => {
+                console.error('LoadGlobalLogsErr', err);
+            })
     }
 
     function loadConversationDiv() {
-        fetch('/samtalerpanett/direct_messages/DmHandler.php', {
+        fetch('/samtalerpanett/Handler/DmHandler.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'loadConversationDiv', user_id: currentUserId })
@@ -118,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
             .catch(err => {
-                console.error('Fetch Error', err);
+                console.error('LoadConvDivErr', err);
             })
     }
 
@@ -132,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        fetch('/samtalerpanett/direct_messages/DmHandler.php?action=getUserId&reciverUser=' + encodeURIComponent(reciverUser))
+        fetch('/samtalerpanett/Handler/DmHandler.php?action=getUserId&reciverUser=' + encodeURIComponent(reciverUser))
             .then(res => res.json())
             .then(data => {
                 console.log("reciverUserData", data);
@@ -140,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert(data.response);
                     return;
                 }
-                fetch('/samtalerpanett/direct_messages/DmHandler.php', {
+                fetch('/samtalerpanett/Handler/DmHandler.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({action: 'createConversation', user1_id: currentUserId, user2_id: data.reciverUserId })
@@ -154,13 +157,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         alert(data.response);
                         loadConversationDiv();
-                    });
+                    })
+                    .catch(err => {
+                        console.error('NewConvErr_createConv', err);
+                    })
             })
             .catch(err => {
-                console.error('Fetch error', err);
-            });
+                console.error('NewConvErr_getUserId', err);
+            })
     }
-
 
     function renderConversationList(conv) {
         if (document.getElementById('conversation-' + conv.conversation_id)) return;
@@ -206,13 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadConvLog(conv) {
         messagesDiv.innerHTML = '';
 
-        fetch('/samtalerpanett/direct_messages/DmHandler.php', {
+        fetch('/samtalerpanett/Handler/DmHandler.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({action: 'loadConversationLog', conversation_id: conv.conversation_id, user2_id: conv.recipientId, user1_id: currentUserId, user1_name: currentUsername, user2_name: conv.recipientUsername})
         })
         .then(res => res.json())
-            .then(data => {
+        .then(data => {
             console.log("loadConvMsgData:", data)
             if (data.success === false) {
                 alert(data.response);
@@ -222,8 +227,11 @@ document.addEventListener('DOMContentLoaded', () => {
             data.forEach(message => {
                 appendMessage(message, true);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            });
-        });
+            })
+        })
+        .catch(err => {
+                console.error('LoadConvLog', err);
+        })
     }
 
     function sendMessage() {

@@ -68,9 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // sjekker at domenet til e-posten faktisk finnes
     elseif (!checkdnsrr(substr(strrchr($email, "@"), 1), "MX")) {
         $error = "E-postdomenet finnes ikke >:(";
-    } elseif (!preg_match('/^.{4,}$/', $new_username)) {
+    }
+    elseif (!preg_match('/^.{4,}$/', $new_username)) {
         $error = "Brukernavnet må være 4 tegn eller mer >:(";
-    } elseif ($new_email !== $user['mail']) {
+    }
+    elseif ($new_email !== $user['mail']) {
         // sjekk om e-post allerede er i bruk, eller, om den allerede er i databasen
         $sql = "SELECT id FROM users WHERE mail = ? AND id != ?";
         $stmt = $mysqli->prepare($sql);
@@ -96,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (sendVerificationEmail($new_email, $new_username, $token, $config)) {
                     // cookies for verify_email_info-siden (nam nam) (haha skjønner du lololool fordi det er jo sånn cookies, eller, kjeks, og det er jo nam nam hahahaha LOL - isak)
                     setcookie("mail_message", "Du må verifisere e-posten før du logger inn igjen. \nEn verifikasjonslink har blitt sendt til \n$new_email", time() + 10, "/");
-                    setcookie("username", $username, time() + 10, "/");
+                    setcookie("username", $_SESSION['username'], time() + 10, "/");
                     setcookie("mail", $new_email, time() + 10, "/");
                     session_unset();
                     session_destroy();
@@ -106,7 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $error = "Kunne ikke sende e-post :(";
                 }
             }
-        } else {
+        }
+        else {
             // hvis bruker ikke endret noe i e-post feltet bare oppdater brukernavn
             $sql = "UPDATE users SET username = ? WHERE id = ?";
             $stmt = $mysqli->prepare($sql);
@@ -116,7 +119,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $message = "Oppdaterte bruker :D";
                 $_SESSION['username'] = $new_username;
                 $_SESSION['email'] = $new_email;
-            } else {
+            }
+            else {
                 $error = "Kunne ikke oppdatere bruker :(";
             }
         }

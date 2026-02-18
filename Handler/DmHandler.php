@@ -1,7 +1,7 @@
 <?php
 session_start();
 require '../include/db.inc.php';
-require 'DmService.php';
+require '../Service/DmService.php';
 header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents("php://input"), true);
