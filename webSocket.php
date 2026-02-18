@@ -2,6 +2,7 @@
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\App;
+use Ratchet\WebSocket\WsConnection;
 
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/include/db.inc.php';
@@ -28,25 +29,29 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onOpen(ConnectionInterface $conn):void{
-        $this->clients[$conn] = true;
+
+        /** @var WsConnection $conn */
+        $query = [];
         parse_str($conn->httpRequest->getUri()->getQuery(), $query);
 
-        if (isset($query['userId'])){
-            $userId = $query['userId'];
-            $conn->userId = $userId;
+        $userId = isset($query['userId']) ? (int)$query['userId'] : null;
+        $this->clients[$conn] = ['userId' => $userId];
+        $resourceId = spl_object_id($conn);
+
+        if ($userId !== null){
 
             if(!isset($this->userConnections[$userId])){
                 $this->userConnections[$userId] = new \SplObjectStorage();
             }
 
             $this->userConnections[$userId][$conn] = true;
-            echo "{$this->date()} ID-{$userId}({$conn->resourceId}) er tilkoblet\n";
 
-            file_put_contents(__DIR__ . '/webSocketLog.syslog', "{$this->date()} ID-{$userId}({$conn->resourceId}) er tilkoblet\n", FILE_APPEND);
+            echo "{$this->date()} ID-{$userId}({$resourceId}) er tilkoblet\n";
+            file_put_contents(__DIR__ . '/webSocketLog.syslog', "{$this->date()} ID-{$userId}({$resourceId}) er tilkoblet\n", FILE_APPEND);
         }
         else {
-            echo "{$this->date()} Ukjent bruker koblet til {$conn->resourceId}\n";
-            file_put_contents(__DIR__ . '/webSocketLog.syslog', "{$this->date()} Ukjent bruker koblet til {$conn->resourceId}\n", FILE_APPEND);
+            echo "{$this->date()} Ukjent bruker koblet til {$resourceId}\n";
+            file_put_contents(__DIR__ . '/webSocketLog.syslog', "{$this->date()} Ukjent bruker koblet til {$resourceId}\n", FILE_APPEND);
         }
     }
 
@@ -133,7 +138,7 @@ class Chat implements MessageComponentInterface {
             return;
         }
 
-        $userId = $fromConn->userId ?? null;
+        $userId = $this->clients[$fromConn]['userId'] ?? null;
         if (!$userId) {
             echo "{$this->date()} Bruker-ID mangler fra tilkoblingen\n";
             file_put_contents(__DIR__ . '/WebSocket_error.log', "{$this->date()} Bruker-ID mangler fra tilkoblingen\n", FILE_APPEND);
@@ -173,6 +178,9 @@ class Chat implements MessageComponentInterface {
 
     // når tilkobling til websocket blir lukket -> når en bruker disconnecter eller hvis tilkoblingen krasjer
     public function onClose(ConnectionInterface $conn):void{
+        $userId = $this->clients[$conn]['userId'] ?? 'unknown';
+        $resourceId = spl_object_id($conn);
+
         foreach ($this->userConnections as $userId => $connections) {
             if (isset($connections[$conn])) {
                 unset($connections[$conn]);
@@ -184,13 +192,10 @@ class Chat implements MessageComponentInterface {
                 break;
             }
         }
-
         unset($this->clients[$conn]);
-        $userId = $conn->userId ?? 'unknown';
-        $socketResponse = "{$this->date()} ID-{$userId}({$conn->resourceId}) er frakoblet\n";
-        echo $socketResponse;
 
-        file_put_contents(__DIR__ . '/webSocketLog.syslog', $socketResponse, FILE_APPEND);
+        echo "{$this->date()} ID-{$userId}({$resourceId}) er frakoblet\n";
+        file_put_contents(__DIR__ . '/webSocketLog.syslog', "{$this->date()} ID-{$userId}({$resourceId}) er frakoblet\n", FILE_APPEND);
     }
 
     // sender feilmeldinger til error log fil :D
