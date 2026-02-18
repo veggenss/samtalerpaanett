@@ -40,7 +40,7 @@ function appendMessage(data) {
         wrapper.style.backgroundColor = "#FFF1F2";
     }
 
-    if (data.username === currentUsername) {
+    if (data.userId == currentUserId) {
         wrapper.style.backgroundColor = "#E9E9FF";
         wrapper.style.flexDirection = "row-reverse";
         wrapper.style.textAlign = "right";
@@ -92,16 +92,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function loadGlobalLog() {
-        fetch('/samtalerpanett/global_chat/get_global_logs.php')
+    function loadGlobalLog(){
+        fetch('/samtalerpanett/Handler/GlobalChatHandler.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({action: 'getLogs'})
+        })
         .then(res => res.json())
         .then(data => {
             messagesDiv.innerHTML = '';
-            data.forEach(message => appendMessage(message, true));
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        })
-        .catch(err => {
-            console.error('LoadGlobalLogsErr', err);
+            console.log("Global message data:", data);
+            data.globalLog.forEach(message => {
+                const standardized = {
+                    userId: message.sender_id,               // key difference
+                    username: message.sender_name,
+                    profilePictureUrl: message.sender_pfp,
+                    message: message.message
+                };
+                appendMessage(standardized);
+            })
         })
     }
 
@@ -191,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const recipientAvatar = document.createElement('img');
         recipientAvatar.classList.add('conversation-avatar');
         recipientAvatar.src = conv.recipient_profile_icon;
-
 
         recipientWrapper.appendChild(recipientAvatar);
         recipientTextWrapper.appendChild(recipientUsername);

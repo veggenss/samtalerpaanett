@@ -13,23 +13,19 @@ $dmService = new DmService($mysqli);
 switch($action){
 
     case 'getUserId':
-        $response = $dmService->getUserId($_GET['reciverUser']);
-        echo json_encode($response);
+        echo json_encode($dmService->getUserId($_GET['reciverUser']));
         exit;
 
     case 'createConversation':
-        $response = $dmService->createConversation($data['user1_id'], $data['user2_id']);
-        echo json_encode($response);
+        echo json_encode($dmService->createConversation($data['user1_id'], $data['user2_id']));
         exit;
 
     case 'loadConversationDiv':
-        $response = $dmService->loadConversationDiv($data);
-        echo json_encode($response);
+        echo json_encode($dmService->loadConversationDiv($data));
         exit;
 
     case 'loadConversationLog':
-        $response = $dmService->loadConversationLog($data);
-        echo json_encode($response);
+        echo json_encode($dmService->loadConversationLog($data));
         exit;
 
     default:

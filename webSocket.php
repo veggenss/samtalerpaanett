@@ -4,21 +4,31 @@ use Ratchet\ConnectionInterface;
 use Ratchet\App;
 
 require __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/include/db.inc.php';
+require __DIR__ . '/include/db.inc.php';
+require __DIR__ . '/Service/DmService.php';
+require __DIR__ . '/Service/GlobalChatService.php';
 
 $mysqli = dbConnection();
 $socketParams = socketParams();
-$d = date("[Y/m/d l:H:i:s] ");
 
 class Chat implements MessageComponentInterface {
     protected $clients;
     protected $userConnections = [];
+    private GlobalChatService $globalChatService;
+    private DmService $dmService;
+
     public function __construct() {
         $this->clients = new \SplObjectStorage();
+        $this->dmService = new DmService(dbConnection());
+        $this->globalChatService = new GlobalChatService(dbConnection());
     }
 
-    public function onOpen(ConnectionInterface $conn) {
-        $this->clients->attach($conn);
+    private function date():string{
+        return date("[Y/m/d l:H:i:s]");
+    }
+
+    public function onOpen(ConnectionInterface $conn):void{
+        $this->clients[$conn] = true;
         parse_str($conn->httpRequest->getUri()->getQuery(), $query);
 
         if (isset($query['userId'])){
@@ -29,27 +39,25 @@ class Chat implements MessageComponentInterface {
                 $this->userConnections[$userId] = new \SplObjectStorage();
             }
 
-            $this->userConnections[$userId]->attach($conn);
+            $this->userConnections[$userId][$conn] = true;
+            echo "{$this->date()} ID-{$userId}({$conn->resourceId}) er tilkoblet\n";
 
-            $socketResponse = date("[Y/m/d l:H:i:s] ") . "Bruker $userId | $conn->resourceId har koblet til\n";
-            echo $socketResponse;
-
-            file_put_contents(__DIR__ . '/webSocketLog.syslog', $socketResponse, FILE_APPEND);
+            file_put_contents(__DIR__ . '/webSocketLog.syslog', "{$this->date()} ID-{$userId}({$conn->resourceId}) er tilkoblet\n", FILE_APPEND);
         }
         else {
-            $socketResponse = date("[Y/m/d l:H:i:s] ") . "[$d]  Ukjent bruker koblet til $conn->resourceId\n";
-            echo $socketResponse;
-            file_put_contents(__DIR__ . '/webSocketLog.syslog', $socketResponse, FILE_APPEND);
+            echo "{$this->date()} Ukjent bruker koblet til {$conn->resourceId}\n";
+            file_put_contents(__DIR__ . '/webSocketLog.syslog', "{$this->date()} Ukjent bruker koblet til {$conn->resourceId}\n", FILE_APPEND);
         }
     }
 
     // direktemelding funksjonalitet
-    private function directMessage($mysqli, $messageData) {
+    // @param array $messageData JSON payload
+    private function directMessage(mysqli $mysqli, array $messageData):void{
         // finner conversation Id hvor userid og recipient id matcher
         $conv_query = "SELECT id, prev_str FROM dm_conversations WHERE (user1_id = ? AND user2_id = ?) OR (user2_id = ? AND user1_id = ?)";
         $conv_stmt = $mysqli->prepare($conv_query);
         if (!$conv_stmt){
-            $socketResponse = date("[Y/m/d l:H:i:s] ") . "prepare conversation query failed :( $mysqli->error \n";
+            $socketResponse = "{$this->date()} prepare conversation query failed :( {$mysqli->error}\n";
             echo $socketResponse;
 
             file_put_contents(__DIR__ . '/WebSocket_error.log', $socketResponse, FILE_APPEND);
@@ -62,11 +70,8 @@ class Chat implements MessageComponentInterface {
         $conv_stmt->store_result();
 
         if ($conv_stmt->num_rows === 0){
-            $socketResponse = date("[Y/m/d l:H:i:s] ") . "Kunne ikke finne samtale mellom " . $messageData['userId'] . " og " . $messageData['recipientId'];
-            echo $socketResponse;
-
-            file_put_contents(__DIR__ . '/WebSocket_error.log', $socketResponse, FILE_APPEND);
-
+            echo "{$this->date()} Kunne ikke finne samtale mellom {$messageData['userId']} og {$messageData['recipientId']}";
+            file_put_contents(__DIR__ . '/WebSocket_error.log', "{$this->date()} Kunne ikke finne samtale mellom {$messageData['userId']} og {$messageData['recipientId']}", FILE_APPEND);
             return;
         }
 
@@ -79,25 +84,20 @@ class Chat implements MessageComponentInterface {
 
         $msg_stmt = $mysqli->prepare($msg_query);
         if (!$msg_stmt) {
-            $socketResponse = date("[Y/m/d l:H:i:s] ") . "message prepare failed :( $mysqli->error \n";
-            echo $socketResponse;
-
-            file_put_contents(__DIR__ . '/WebSocket_error.log', $socketResponse, FILE_APPEND);
-
+            echo "{$this->date()} Message prepare failed :( {$mysqli->error}\n";
+            file_put_contents(__DIR__ . '/WebSocket_error.log', "{$this->date()} Message prepare failed :( {$mysqli->error}\n", FILE_APPEND);
             return;
         }
 
         $msg_stmt->bind_param("iiis", $conversationId, $messageData['userId'], $messageData['recipientId'], $messageData['message']);
 
         if (!$msg_stmt->execute()) {
-            $socketResponse = date("[Y/m/d l:H:i:s] ") . "message insertion failed $mysqli->error \n";
-            echo $socketResponse;
-            file_put_contents(__DIR__ . '/WebSocket_error.log', $socketResponse, FILE_APPEND);
+            echo "{$this->date()} Message insertion failed {$mysqli->error}\n";
+            file_put_contents(__DIR__ . '/WebSocket_error.log', "{$this->date()} Message insertion failed {$mysqli->error}\n", FILE_APPEND);
             return;
         }
 
         if ($prevStr !== $messageData['message']) {
-            echo "Oppdaterer prev_str...";
             $prev_query = "UPDATE dm_conversations SET prev_str = ? WHERE id = ?";
             $prev_stmt = $mysqli->prepare($prev_query);
             $prev_stmt->bind_param("si", $messageData['message'], $conversationId);
@@ -108,7 +108,8 @@ class Chat implements MessageComponentInterface {
     }
 
     // sender meldinger til brukere
-    private function sendToUser($userId, $recipientId, $message) {
+    //@param array $message JSON
+    private function sendToUser(int $userId, int $recipientId, string $message):void{
         if (isset($this->userConnections[$userId])) {
             foreach ($this->userConnections[$userId] as $conn) {
                 $conn->send($message);
@@ -123,9 +124,8 @@ class Chat implements MessageComponentInterface {
         }
     }
 
-
     // når en melding blir sendt
-    public function onMessage(ConnectionInterface $fromConn, $msg) {
+    public function onMessage(ConnectionInterface $fromConn, $msg):void{
         $data = json_decode($msg, true);
 
         // hvis det ikke var noe i meldingen
@@ -135,15 +135,12 @@ class Chat implements MessageComponentInterface {
 
         $userId = $fromConn->userId ?? null;
         if (!$userId) {
-            $socketResponse = date("[Y/m/d l:H:i:s] ") . "Bruker-ID mangler fra tilkoblingen\n";
-            echo $socketResponse;
-
-            file_put_contents(__DIR__ . '/WebSocket_error.log', $socketResponse, FILE_APPEND);
-
+            echo "{$this->date()} Bruker-ID mangler fra tilkoblingen\n";
+            file_put_contents(__DIR__ . '/WebSocket_error.log', "{$this->date()} Bruker-ID mangler fra tilkoblingen\n", FILE_APPEND);
             return;
         }
 
-        // dataen fra meldingen :)
+        // dataen fra meldingen
         $messageData = [
             'recipientId' => $data['recipientId'],
             'type' => $data['type'],
@@ -157,11 +154,15 @@ class Chat implements MessageComponentInterface {
         if ($data['type'] === 'global' && $data['recipientId'] === 'all') {
             $encodedMessage = json_encode($messageData);
 
+            $response = $this->globalChatService->pushMessage($messageData);
+
+            if(!$response['success']){
+                echo $response['message'];
+            }
+
             foreach ($this->clients as $clientConn) {
                 $clientConn->send($encodedMessage);
             }
-
-            file_put_contents(__DIR__ . '/global_chat/global_chat_log.txt', json_encode($messageData) . PHP_EOL, FILE_APPEND);
         }
 
         // hvis du ikke er i global chat, call heller på directMessage() funksjonen og pass messageData over til den
@@ -171,10 +172,10 @@ class Chat implements MessageComponentInterface {
     }
 
     // når tilkobling til websocket blir lukket -> når en bruker disconnecter eller hvis tilkoblingen krasjer
-    public function onClose(ConnectionInterface $conn) {
+    public function onClose(ConnectionInterface $conn):void{
         foreach ($this->userConnections as $userId => $connections) {
-            if ($connections->contains($conn)) {
-                $connections->detach($conn);
+            if (isset($connections[$conn])) {
+                unset($connections[$conn]);
 
                 if (count($connections) === 0) {
                     unset($this->userConnections[$userId]);
@@ -184,16 +185,17 @@ class Chat implements MessageComponentInterface {
             }
         }
 
-        $this->clients->detach($conn);
-        $socketResponse = date("[Y/m/d l:H:i:s] ") . "Bruker $userId | $conn->resourceId har koblet fra\n";
+        unset($this->clients[$conn]);
+        $userId = $conn->userId ?? 'unknown';
+        $socketResponse = "{$this->date()} ID-{$userId}({$conn->resourceId}) er frakoblet\n";
         echo $socketResponse;
 
         file_put_contents(__DIR__ . '/webSocketLog.syslog', $socketResponse, FILE_APPEND);
     }
 
     // sender feilmeldinger til error log fil :D
-    public function onError(ConnectionInterface $conn, \Exception $e) {
-        file_put_contents(__DIR__ . '/WebSocket_error.log', date('c') . " Error: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
+    public function onError(ConnectionInterface $conn, \Exception $e):void{
+        file_put_contents(__DIR__ . '/WebSocket_error.log', $this->date() . " Error: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
 
         $conn->close();
     }

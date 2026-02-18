@@ -2,7 +2,7 @@
 class DmService{
     private mysqli $mysqli;
 
-   public function __construct(mysqli $mysqli){
+    public function __construct(mysqli $mysqli){
         $this->mysqli = $mysqli;
    }
 
@@ -17,13 +17,13 @@ class DmService{
        if($stmt->num_rows > 0){
            $stmt->bind_result($reciverUserId);
            $stmt->fetch();
-           $UsernameToUserId = ["success" => true, "response" => "Id funnet", "reciverUserId" => $reciverUserId];
+           $usernameToUserId = ["success" => true, "response" => "Id funnet", "reciverUserId" => $reciverUserId];
            $stmt->close();
        }
        else{
-           $UsernameToUserId = ["success" => false, "response" => "Kunne ikke finne id med brukernavn \"$reciverUser\" i db"];
+           $usernameToUserId = ["success" => false, "response" => "Kunne ikke finne id med brukernavn \"$reciverUser\" i db"];
        }
-       return $UsernameToUserId;
+       return $usernameToUserId;
    }
 
    public function createConversation(int $user1_id, int $user2_id):array{
@@ -48,13 +48,14 @@ class DmService{
        $stmt->bind_param("ii", $user1_id, $user2_id);
        $result = $stmt->execute();
 
-       $result && $stmt->affected_rows === 1 ? $convResponse = ["success" => true, "response" => "Opprettet samtale mellom $user1_id og $user2_id"] :$convResponse = ["success" => false, "response" => "Denne samtalen finnes allerede"];
+       $result && $stmt->affected_rows === 1 ? $convResponse = ["success" => true, "response" => "Opprettet samtale mellom $user1_id og $user2_id"] : $convResponse = ["success" => false, "response" => "Denne samtalen finnes allerede"];
 
        $stmt->close();
        return $convResponse;
    }
 
    //laster inn aktive samtaler slik at de er listet i sidepanelet
+   //@param array $data JSON payload
    public function loadConversationDiv(array $data):array{
        if (!isset($data['user_id'])) {
            return $convResponse = ["success" => false, "response" => "user_id er ikke definert"];
@@ -97,6 +98,7 @@ class DmService{
         return $convResponse;
    }
 
+   //@param array $data JSON payload
    public function loadConversationLog(array $data):array{
        //laster meldinger fra messages|
        if(!isset($data['user1_id'], $data['user2_id'], $data['conversation_id'])){
@@ -118,7 +120,8 @@ class DmService{
                    $messageData[] = [
                        "profilePictureUrl" => $user1_icon,
                        "username" => $data['user1_name'],
-                       "message" => $row['message']
+                       "message" => $row['message'],
+                       "userId" => $row['sender_id']
                    ];
                    break;
 
@@ -128,7 +131,8 @@ class DmService{
                    $messageData[] = [
                        "profilePictureUrl" => $user2_icon,
                        "username" => $data['user2_name'],
-                       "message" => $row['message']
+                       "message" => $row['message'],
+                       "userId" => $row['sender_id']
                    ];
                    break;
            }
