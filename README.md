@@ -23,7 +23,7 @@
 Du må ha [PHP](https://www.php.net) installert med [MySQLIi](https://www.php.net/manual/en/mysqli.installation.php) extension enablet, [MYSQL](https://www.mysql.com/)/[MariaDB](https://mariadb.org/) en webserver (f.eks [Apache](https://httpd.apache.org/) eller [Nginx](https://nginx.org)) som faktisk hoster alt, og [Composer](https://getcomposer.org) for å installere: [PHPMailer](https://github.com/PHPMailer/PHPMailer), [PHPdotenv](https://github.com/vlucas/phpdotenv) og [Ratchet](https://github.com/ratchetphp/Ratchet)
 <br> <br>
 
-**Hvordan setter jeg opp databasen?** Last ned [denne SQL filen](https://github.com/IsakBH/isakbh/blob/main/assets/samtalerpanettutvikling.sql) - det er en eksportering av databasen vi bruker i Samtaler på Nett. Jeg skal prøve mitt beste å holde denne SQL filen så oppdatert som mulig. Hvis det er noe som ikke funker, altså, den er utdatert, vennligst kontakt [@IsakBH](https://www.github.com/IsakBH). For å faktisk lage databasen og sånn, gå inn i mariadb/mysql og skriv:
+**Hvordan setter jeg opp databasen?** Last ned [denne SQL filen][conversationWeb.sql](https://github.com/user-attachments/files/25391230/conversationWeb.sql) - det er en eksportering av databasen vi bruker i Samtaler på Nett. Jeg skal prøve mitt beste å holde denne SQL filen så oppdatert som mulig. Hvis det er noe som ikke funker, altså, den er utdatert, vennligst kontakt [@IsakBH](https://www.github.com/IsakBH). For å faktisk lage databasen og sånn, gå inn i mariadb/mysql og skriv:
 ```sql
 CREATE DATABASE conversationWeb;
 ```
