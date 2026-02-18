@@ -134,7 +134,9 @@ class DmService{
            }
        }
        $stmt->close();
-       return $messageData;
+
+       $convResponse = ["success" => true, "messageData" => $messageData];
+       return $convResponse;
    }
 
    private function getUserIcon(int $user_id):string{

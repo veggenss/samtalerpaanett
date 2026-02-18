@@ -33,6 +33,6 @@ switch($action){
         exit;
 
     default:
-        echo json_encode("No action");
+        echo json_encode(["success" => false, "message" => "No action"]);
         exit;
 }

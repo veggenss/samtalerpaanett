@@ -94,15 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadGlobalLog() {
         fetch('/samtalerpanett/global_chat/get_global_logs.php')
-            .then(res => res.json())
-            .then(data => {
-                messagesDiv.innerHTML = '';
-                data.forEach(message => appendMessage(message, true));
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            })
-            .catch(err => {
-                console.error('LoadGlobalLogsErr', err);
-            })
+        .then(res => res.json())
+        .then(data => {
+            messagesDiv.innerHTML = '';
+            data.forEach(message => appendMessage(message, true));
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        })
+        .catch(err => {
+            console.error('LoadGlobalLogsErr', err);
+        })
     }
 
     function loadConversationDiv() {
@@ -111,18 +111,18 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'loadConversationDiv', user_id: currentUserId })
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log("loadConvData:", data);
-                if (data.success === true && Array.isArray(data.conversations)) {
-                    data.conversations.forEach(conv => {
-                        renderConversationList(conv);
-                    })
-                }
-            })
-            .catch(err => {
-                console.error('LoadConvDivErr', err);
-            })
+        .then(res => res.json())
+        .then(data => {
+            console.log("loadConvData:", data);
+            if (data.success === true && Array.isArray(data.conversations)) {
+                data.conversations.forEach(conv => {
+                    renderConversationList(conv);
+                })
+            }
+        })
+        .catch(err => {
+            console.error('LoadConvDivErr', err);
+        })
     }
 
     function newConversation() {
@@ -136,35 +136,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         fetch('/samtalerpanett/Handler/DmHandler.php?action=getUserId&reciverUser=' + encodeURIComponent(reciverUser))
+        .then(res => res.json())
+        .then(data => {
+            console.log("reciverUserData", data);
+            if (data.success === false) {
+                alert(data.response);
+                return;
+            }
+            fetch('/samtalerpanett/Handler/DmHandler.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({action: 'createConversation', user1_id: currentUserId, user2_id: data.reciverUserId })
+            })
             .then(res => res.json())
             .then(data => {
-                console.log("reciverUserData", data);
+                console.log("createConvData", data);
                 if (data.success === false) {
                     alert(data.response);
                     return;
                 }
-                fetch('/samtalerpanett/Handler/DmHandler.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({action: 'createConversation', user1_id: currentUserId, user2_id: data.reciverUserId })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log("createConvData", data);
-                        if (data.success === false) {
-                            alert(data.response);
-                            return;
-                        }
-                        alert(data.response);
-                        loadConversationDiv();
-                    })
-                    .catch(err => {
-                        console.error('NewConvErr_createConv', err);
-                    })
+                alert(data.response);
+                loadConversationDiv();
             })
             .catch(err => {
-                console.error('NewConvErr_getUserId', err);
+                console.error('NewConvErr_createConv', err);
             })
+        })
+        .catch(err => {
+            console.error('NewConvErr_getUserId', err);
+        })
     }
 
     function renderConversationList(conv) {
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             messagesDiv.innerHTML = '';
-            data.forEach(message => {
+            data.messageData.forEach(message => {
                 appendMessage(message, true);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             })
