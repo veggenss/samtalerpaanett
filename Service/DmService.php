@@ -6,6 +6,19 @@ class DmService{
         $this->mysqli = $mysqli;
    }
 
+   private function getUserIcon(int $user_id):string{
+       $icon_stmt = $this->mysqli->prepare("SELECT profile_picture FROM users WHERE id = ?");
+       $icon_stmt->bind_param("i", $user_id);
+       $icon_stmt->execute();
+       $icon_result = $icon_stmt->get_result();
+       $icon_data = $icon_result->fetch_assoc();
+       $icon_stmt->close();
+
+       $profile_picture = $icon_data['profile_picture'] ?? 'default.png';
+       $profile_picture_url = '/samtalerpanett/uploads/' . ltrim($profile_picture, '/');
+       return $profile_picture_url;
+   }
+
    public function getUserId(string $getData):array{
        $reciverUser = $getData;
 
@@ -143,16 +156,32 @@ class DmService{
        return $convResponse;
    }
 
-   private function getUserIcon(int $user_id):string{
-       $icon_stmt = $this->mysqli->prepare("SELECT profile_picture FROM users WHERE id = ?");
-       $icon_stmt->bind_param("i", $user_id);
-       $icon_stmt->execute();
-       $icon_result = $icon_stmt->get_result();
-       $icon_data = $icon_result->fetch_assoc();
-       $icon_stmt->close();
+   public function directMessageInsert(array $messageData):array{
+       // finner conversation Id hvor userid og recipient id matcher
+       $conv_stmt = $this->mysqli->prepare("SELECT id FROM dm_conversations WHERE (user1_id = ? AND user2_id = ?) OR (user2_id = ? AND user1_id = ?)");
+       if (!$conv_stmt) return ["success" => false, "message" => "conv_stmt failed", "error" => $this->mysqli->error];
 
-       $profile_picture = $icon_data['profile_picture'] ?? 'default.png';
-       $profile_picture_url = '/samtalerpanett/uploads/' . ltrim($profile_picture, '/');
-       return $profile_picture_url;
+       $conv_stmt->bind_param("iiii", $messageData['userId'], $messageData['recipientId'], $messageData['userId'], $messageData['recipientId']);
+       $conv_stmt->execute();
+       $conv_stmt->store_result();
+       if ($conv_stmt->num_rows === 0) return ["success" => false, "message" => "Kunne ikke finne samtale mellom {$messageData['userId']} og {$messageData['recipientId']}", "error" => $this->mysqli->error];
+
+       $conv_stmt->bind_result($conversationId);
+       $conv_stmt->fetch();
+
+       $msg_stmt = $this->mysqli->prepare("INSERT INTO dm_messages (conversation_id, sender_id, to_user_id, message) VALUES (?, ?, ?, ?)");
+       if (!$msg_stmt) return ["success" => false, "message" => "DM prepare failed", "error" => $this->mysqli->error];
+
+       $msg_stmt->bind_param("iiis", $conversationId, $messageData['userId'], $messageData['recipientId'], $messageData['message']);
+       if (!$msg_stmt->execute()) return ["success" => false, "message" => "DM insertion failed", "error" => $this->mysqli->error];
+       return ["success" => true, "convId" => $conversationId];
+   }
+
+   public function previewString(int $convId, string $prevStr):bool{
+       //TODO, get current prevStr from db then compare to given prevStr
+       $stmt = $this->mysqli->prepare("UPDATE dm_conversations SET prev_str = ? WHERE id = ? AND prev_str <> ?");
+       $stmt->bind_param("sis", $prevStr, $convId, $prevStr);
+       if($stmt->execute() && $stmt->affected_rows > 0) return true;
+       return false;
    }
 }
