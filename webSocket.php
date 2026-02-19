@@ -120,8 +120,10 @@ class Chat implements MessageComponentInterface {
                 echo $dmResponse['message'];
                 return;
             }
+            if (!$this->dmService->previewString($dmResponse['convId'], $messageData['message']))
+                return;
+            $messageData['convId'] = $dmResponse['convId'];
             $this->sendToUser($messageData['userId'], $messageData['recipientId'], json_encode($messageData));
-            $this->dmService->previewString($dmResponse['convId'], $messageData['message']);
         }
     }
 

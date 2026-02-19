@@ -179,7 +179,7 @@ class DmService{
 
    public function previewString(int $convId, string $prevStr):bool{
        //TODO, get current prevStr from db then compare to given prevStr
-       $stmt = $this->mysqli->prepare("UPDATE dm_conversations SET prev_str = ? WHERE id = ? AND prev_str <> ?");
+       $stmt = $this->mysqli->prepare("UPDATE dm_conversations SET prev_str = ? WHERE id = ? AND prev_str <> ? OR prev_str IS NULL");
        $stmt->bind_param("sis", $prevStr, $convId, $prevStr);
        if($stmt->execute() && $stmt->affected_rows > 0) return true;
        return false;

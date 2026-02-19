@@ -9,6 +9,7 @@ const currentUsername = window.currentUsername;
 const currentProfilePictureUrl = window.currentProfilePictureUrl;
 
 let activeChatType = "global";
+let activeConvId = null;
 let recipientId = "all";
 let sending = false;
 let ws = null;
@@ -47,6 +48,10 @@ function appendMessage(data) {
         wrapper.style.marginLeft = "auto";
     }
 
+    if (data.type == "direct" && (data.recipientId == currentUserId || data.userId === currentUserId) && data.message != null) {
+        updatePreviewStr(data.message, data.convId);
+    }
+
     content.appendChild(username);
     content.appendChild(text);
     wrapper.appendChild(avatar);
@@ -61,6 +66,16 @@ function appendSystemMessage(message) {
         message,
         profilePictureUrl: "assets/icons/default.png"
     });
+}
+
+function updatePreviewStr(str, convId) {
+    parent = document.getElementById('conversation-' + convId);
+    child = parent.querySelector(".conversation-prevStr");
+    if (!child) {
+        console.warn("Preview child not found in conv: ", convId);
+        return;
+    }
+    child.textContent = str;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -104,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Global message data:", data);
             data.globalLog.forEach(message => {
                 const standardized = {
-                    userId: message.sender_id,               // key difference
+                    userId: message.sender_id,
                     username: message.sender_name,
                     profilePictureUrl: message.sender_pfp,
                     message: message.message
@@ -209,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         wrapper.addEventListener('click', () => {
             activeChatType = "direct";
+            activeConvId = conv.conversation_id;
             recipientId = conv.recipientId;
             loadConvLog(conv);
         });
