@@ -18,7 +18,7 @@ function setupWebSocket() {
         if (activeChatType === "global" && data.convId == null) {
            appendMessage(data);
         }
-        else if (activeChatType == data.type && activeConv === data.convId) {
+        else if (activeChatType == data.type && activeConvId === data.convId) {
             appendMessage(data);
         }
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
