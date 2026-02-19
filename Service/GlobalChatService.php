@@ -11,7 +11,7 @@ class GlobalChatService{
         if(!$globalLog){
             return ["success" => false, "message" => "Database Error"];
         }
-        return ["success" => false, "globalLog" => $globalLog->fetch_all(MYSQLI_ASSOC)];
+        return ["success" => true, "globalLog" => $globalLog->fetch_all(MYSQLI_ASSOC)];
     }
 
     public function pushMessage(array $data):array{
